@@ -1,18 +1,21 @@
 from tkinter import *
 from Initial_encryption import encrypt, decrypt
+from Improved_encryption import encrypt_with_substitution, decrypt_with_substitution
 
+func_encrypt = encrypt_with_substitution
+func_decrypt = decrypt_with_substitution
 
 def encrypt_text():
     text = input_text.get("1.0", END).strip()
     key = key_enc.get("1.0", END).strip()
-    encrypted_text = encrypt(text, key)
+    encrypted_text = func_encrypt(text, key)
     output_text.delete("1.0", END)
     output_text.insert(END, encrypted_text)
 
 def decrypt_text():
     text = input_text_decrypt.get("1.0", END).strip()
     key = key_dec.get("1.0", END).strip()
-    decrypted_text = decrypt(text, key)
+    decrypted_text = func_decrypt(text, key)
     output_text_decrypt.delete("1.0", END)
     output_text_decrypt.insert(END, decrypted_text)
 

@@ -76,8 +76,3 @@ def create_key_order(keyword):
                 indexed_key.remove((index, sorted_char))
                 break
     return index_list
-
-
-text = "ВОТЭТОДАКОДСУПЕР"
-key = "СЕКРЕТ"
-print(create_key_order(key))
