@@ -6,27 +6,25 @@ def encrypt(text, keyword):
     :return: encrypt_text - зашифрованное сообщение
     """
     num_columns = len(keyword)
-    table = [''] * num_columns
-    empty_cells = len(text) % num_columns + 1
-    for inx, char in enumerate(text):
-        column = inx % num_columns
+    num_rows = -(-len(text) // num_columns)  # Округляем вверх для расчета строк
+    empty_cells = num_columns * num_rows - len(text)
+
+    # Заполняем таблицу посимвольно
+    table = ['' for _ in range(num_columns)]
+    for i, char in enumerate(text):
+        column = i % num_columns
         table[column] += char
-    for i in range(1, empty_cells):
-        empty_char = '-'
-        table[-i] += empty_char
+
+    # Заполняем пустые ячейки в последнем ряду символом "-"
+    for i in range(empty_cells):
+        table[-(i + 1)] += '-'
+
+    # Сортируем столбцы по ключу
     sorted_columns = create_key_order(keyword)
-    len_table = len(table)
-    encrypt_list = []
-    i = 0
-    if i < len_table:
-        for value in sorted_columns:
-            value_tuple = value, table[i]
-            encrypt_list.append(value_tuple)
-            i += 1
-    sorted_list = sorted(encrypt_list)
-    encrypt_text = ''
-    for i in range(num_columns):
-        encrypt_text += sorted_list[i][1]
+    sorted_table = [table[i - 1] for i in sorted_columns]
+
+    # Объединяем столбцы в зашифрованный текст
+    encrypt_text = ''.join(sorted_table)
     return encrypt_text
 
 
@@ -39,24 +37,26 @@ def decrypt(text, keyword):
     :return: decrypt_text - расшифрованное сообщение
     """
     num_columns = len(keyword)
-    num_rows = len(text) // len(keyword)
-    table = []
-    for i in range(num_columns):
-        row_text = text[i * num_rows: (i + 1) * num_rows]
-        table.append(row_text)
+    num_rows = len(text) // num_columns
+    empty_cells = num_columns * num_rows - len(text)
+
+    # Разделяем зашифрованный текст на столбцы
     sorted_columns = create_key_order(keyword)
-    table = list(enumerate(table, 1))
-    decrypt_list_enumerate = []
-    decrypt_list = []
-    for value in sorted_columns:
-        value_tuple = value, table[value-1][1]
-        decrypt_list_enumerate.append(value_tuple)
-        decrypt_list.append(table[value-1][1])
-    decrypt_text = ""
-    for i in range(len(decrypt_list[0])):
-        for block in decrypt_list:
-            decrypt_text += block[i]
-    decrypt_text = decrypt_text.replace("-", "")
+    table = ['' for _ in range(num_columns)]
+    col_start = 0
+
+    for index in sorted_columns:
+        col_len = num_rows - 1 if index > num_columns - empty_cells else num_rows
+        table[index - 1] = text[col_start:col_start + col_len]
+        col_start += col_len
+
+    # Восстанавливаем текст, собирая строки по символам из каждого столбца
+    decrypt_text = ''
+    for row in range(num_rows):
+        for col in table:
+            if row < len(col):
+                decrypt_text += col[row]
+    decrypt_text = decrypt_text.replace("-", "")  # Убираем символы заполнения
     return decrypt_text
 
 
